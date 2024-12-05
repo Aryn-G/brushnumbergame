@@ -1,5 +1,9 @@
 const restartBtn = document.getElementById("restart");
 restartBtn.addEventListener("click", () => restart());
+// const canvas = document.getElementsByTagName("canvas");
+window.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+});
 
 const SICK = 0,
   CLEAN = 1;
@@ -27,6 +31,8 @@ let ONBOARDING_TEXT =
   "How To Play:\n" +
   "- Create brushes by right clicking on vertices\n" +
   "- Move a brush from one vertex V to an adjacent vertex U by left clicking on V and then U. \n\n";
+
+let error = "";
 
 class Vertex {
   constructor(id, x, y, radius, state, brushNumber) {
@@ -83,10 +89,15 @@ class Vertex {
             (e[0] == selected[0].id && e[1] == this.id) ||
             (e[1] == selected[0].id && e[0] == this.id)
         );
-        if (this == selected[0]) secondClick(this);
-        if (e != undefined) {
-          if (selected[0].brushNumber >= selected[0].degree) secondClick(this);
-        }
+        if (this == selected[0]) {
+          secondClick(this);
+          error = "";
+        } else if (e != undefined) {
+          if (selected[0].brushNumber >= selected[0].degree) {
+            secondClick(this);
+            error = "";
+          } else error = "Cannot Move! Brush Count < Degree";
+        } else error = "Cannot Move! Vertex not Adjacent";
       } else firstClick(this);
     }
   }
@@ -94,7 +105,7 @@ class Vertex {
 
 let clicks = 0;
 let brushes = 0;
-/** @type {{n: number, n1: number, n2: number, e: [number, number, number][], type: "Cn" | "Kn" | "Bi" }} */
+/** @type {{n: number, n1: number, n2: number, e: [number, number, number][], type: "Cn" | "Kn" | "Bi" | "Knm" }} */
 let graph = {
   n: 0,
   n1: 0,
@@ -107,7 +118,6 @@ let graph = {
 let buttons = [];
 
 function restart() {
-  console.log("hi");
   clicks = 0;
   brushes = 0;
   WIN = false;
@@ -259,11 +269,15 @@ function draw() {
 
     return;
   }
-
-  text("Graph Type: " + graph.type, WIDTH / 2, 20);
+  let c =
+    (graph.type == "Knm") | (graph.type == "Bi")
+      ? graph.n1 + "," + graph.n2
+      : graph.n;
+  text(`Graph Type: ${graph.type[0] + c}`, WIDTH / 2, 20);
   text("Moves: " + clicks, WIDTH / 2, 40);
   text("Brushes: " + brushes, WIDTH / 2, 60);
   if (WIN) text("YOU WIN!!", WIDTH / 2, 80);
+  if (error) text(error, WIDTH / 2, 480);
   // buttons.forEach((button) => button.draw());
   graph.e.forEach((edge) => {
     const b1 = buttons[edge[0]];
