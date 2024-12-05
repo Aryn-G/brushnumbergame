@@ -15,12 +15,19 @@ let selectedEdge;
 let WIN = false;
 let FIRST_LOAD = true;
 let ONBOARDING_TEXT =
-  "The brush number of a graph is the number of brushes it takes " +
-  'to full "clean" a contaminated graph.\n\n' +
-  "Instructions:\n" +
-  " - Create a New Brush by Right Clicking\n" +
-  " - Move brushes from one Vertex to another by Left Clicking\n\n" +
-  " IMPORTANT: Can only move brush from a vertex if the number of brushes it holds is atleast equal to its degree";
+  "In this game, all vertices and edges of a graph are covered by a contaminant " +
+  "(indicated with green). The contaminant must be removed using cleaning brushes. " +
+  "Brushes start at vertices and can travel along adjacent edges. Traveling an edge " +
+  "means both the edge and the ending vertex are cleaned.\n\n" +
+  "" +
+  "The main challange in the game comes from the fact that you can only move a brush from a vertex if the number " +
+  "of brushes it holds is greater than or equal to its own degree\n\n" +
+  "" +
+  "You goal is to clean the graph.\n\n" +
+  "How To Play:\n" +
+  "- Create brushes by right clicking on vertices\n" +
+  "- Move a brush from one vertex V to an adjacent vertex U by left clicking on V and then U. \n\n";
+
 class Vertex {
   constructor(id, x, y, radius, state, brushNumber) {
     this.id = id;
@@ -33,6 +40,8 @@ class Vertex {
   }
 
   draw() {
+    if (this.degree == 0) this.state = CLEAN;
+
     if (dist(mouseX, mouseY, this.x, this.y) < this.radius) {
       fill(240);
     } else {
@@ -229,6 +238,7 @@ function setup() {
   noStroke();
   ellipseMode(RADIUS);
   restart();
+  textFont("Bricolage Grotesque");
 }
 
 function draw() {
